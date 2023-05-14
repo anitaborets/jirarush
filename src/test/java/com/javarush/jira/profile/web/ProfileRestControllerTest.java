@@ -86,7 +86,6 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         user.setRoles(null);
         user.setDisplayName("test user");
         user.setFirstName("test user");
-
         Profile profile = new Profile();
         profile.setId(user.getId());
         result = mapper.toTo(profile);
