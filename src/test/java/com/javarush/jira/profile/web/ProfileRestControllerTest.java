@@ -75,7 +75,6 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     ProfileMapper mapper;
-
     @Mock
     AbstractProfileController abstractProfileController;
 
