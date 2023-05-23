@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<!--/*@thymesVar id="authUser" type="com.javarush.jira.login.AuthUser"*/-->
+<!--/*@thymesVar id="taskMap" type="java.util.Map<com.javarush.jira.bugtracking.to.SprintTo, java.util.List<com.javarush.jira.bugtracking.to.TaskTo>>"*/-->
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<th:block th:replace="~{layout/main::page(title='JiraRush: mini bugtracking system',appMain=~{::appMain})}">
+    <appMain>
+        <h1 align="center">Backlog</h1>
+        <div class="container text-center">
+            <table class="table table-bordered table-sm table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th th:text="Project"></th>
+                    <th th:text="Title"></th>
+                    <th th:text="Description"></th>
+                    <th th:text="Priority"></th>
+                    <th th:text="Type"></th>
+                    <th th:text="Status"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.project.title}" scope="col"></td>
+                    <td th:text="${task.title}" scope="col"></td>
+                    <td th:text="${task.description}" scope="col"></td>
+                    <td th:text="${task.priorityCode}" scope="col"></td>
+                    <td th:text="${task.typeCode}" scope="col"></td>
+                    <td th:text="${task.statusCode}" scope="col"></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div>
+            <h2 align="center">
+                <button style="btn btn-light" th:each="pageNumber:${page_numbers}" class="button-page">
+                    <a th:href="@{/backlog(page=${pageNumber},size=2)}" th:text="${pageNumber}"
+                       th:classappend="${pageNumber==current_page}"></a>
+                </button>
+            </h2>
+        </div>
+    </appMain>
+</th:block>

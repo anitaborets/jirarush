@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class TaskTo extends NodeTo<TaskTo> {
     @NoHtml
     String description;
 
-    @NotNull
+    //@NotNull
     SprintTo sprint;
 
     @NotNull
