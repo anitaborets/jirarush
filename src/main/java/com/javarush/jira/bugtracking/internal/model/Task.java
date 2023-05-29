@@ -68,8 +68,9 @@ public class Task extends TitleEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<@Size(min = 2, max = 32) String> tags = Set.of();
 
-    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
-    private List<Activity> activities;
+   // @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    //@Transient
+   // private List<Activity> activities;
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)

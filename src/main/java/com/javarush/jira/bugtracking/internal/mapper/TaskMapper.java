@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {SprintMapper.class, ProjectMapper.class})
+@Mapper(componentModel = "spring", uses = {SprintMapper.class, ProjectMapper.class, ActivityMapper.class})
 public interface TaskMapper extends BaseMapper<Task, TaskTo> {
 
     @Mapping(target = "enabled", expression = "java(task.isEnabled())")

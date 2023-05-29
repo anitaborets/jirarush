@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <th:block th:replace="~{layout/main::page(title='JiraRush: mini bugtracking system',appMain=~{::appMain})}">
     <appMain>
-        <h1 th:text="#{label.addTask}"></h1>
+        <h1 th:text="#{label.addTask}" th:align="center"></h1>
         <div class="container text-center">
             <form th:method="POST" th:action="@{/add}" th:object="${task}">
                 <div class="form-group">
@@ -30,12 +30,15 @@
                         <option th:value="'story'" th:text="story"></option>
                         <option th:value="'epic'" th:text="epic"></option>
                     </select>
+                    <br>
+                    <br>
 
-
-                    <select th:field="*{statusCode}" th:text="status">
-                        <option th:value="'in progress'" th:text="in progress"></option>
-                        <option th:value="'ready'" th:text="ready"></option>
-                        <option th:value="'done'" th:text="done"></option>
+                    <select th:field="*{statusCode}">
+                        <option th:value="'backlog'" th:text="Backlog"></option>
+                        <option th:value="'done'" th:text="Done"></option>
+                        <option th:value="'ready'" th:text="Ready"></option>
+                        <option th:value="'icebox'" th:text="Icebox"></option>
+                        <option th:value="'in_progress'" th:text="in_progress"></option>
                     </select>
                     <br>
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,11 +21,12 @@ import java.util.stream.Collectors;
 public class DashboardUIController {
 
     private TaskService taskService;
-
     @GetMapping("/") // index page
-    public String getAll(Model model) {
+    public String getAll(Locale locale, Model model) {
+        log.info("Welcome home! The client locale is {}.", locale);
         List<TaskTo> tasks = taskService.getAll();
         Map<SprintTo, List<TaskTo>> taskMap = tasks.stream()
+                .filter(t -> t.getSprint() != null)
                 .collect(Collectors.groupingBy(TaskTo::getSprint));
         model.addAttribute("taskMap", taskMap);
         return "index";

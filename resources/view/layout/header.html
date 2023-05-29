@@ -13,7 +13,6 @@
                     <div>
                         <span th:text="#{lang.change}"></span>:
                         <select id="locales">
-                            <option value=""></option>
                             <option value="en" th:text="#{lang.eng}"></option>
                             <option value="ru" th:text="#{lang.RU}"></option>
                             <option value="sk" th:text="#{lang.SK}"></option>
@@ -21,10 +20,10 @@
                         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js">
                         </script>
                         <script type="text/javascript">
-                            $(document).ready(function() {
+                            $(document).ready(function () {
                                 $("#locales").change(function () {
                                     var selectedOption = $('#locales').val();
-                                    if (selectedOption != ''){
+                                    if (selectedOption != '') {
                                         window.location.replace('/?language=' + selectedOption);
                                     }
                                 });
@@ -44,7 +43,6 @@
                     <div th:if="${authUser} == null">
                         <a href="/view/login" type="button" class="btn btn-orange" th:text="#{label.login}"></a>
                     </div>
-
 
 
                     <th:block th:if="${authUser} != null">

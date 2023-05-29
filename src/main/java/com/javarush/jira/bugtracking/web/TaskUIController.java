@@ -1,8 +1,13 @@
 package com.javarush.jira.bugtracking.web;
 
 import com.javarush.jira.bugtracking.TaskService;
+import com.javarush.jira.bugtracking.internal.mapper.TaskMapper;
 import com.javarush.jira.bugtracking.internal.model.Task;
 import com.javarush.jira.bugtracking.internal.repository.TaskRepository;
+import com.javarush.jira.bugtracking.internal.repository.WatchersRepository;
+import com.javarush.jira.bugtracking.to.TaskTo;
+import com.javarush.jira.login.AuthUser;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -11,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -31,23 +38,8 @@ public class TaskUIController {
 
     @Autowired
     private TaskRepository taskRepository;
-    @GetMapping("/add")
-    public String showForm(Model model) {
-        model.addAttribute("task", new Task());
-        return "add";
-    }
-
-    @PostMapping("/add")
-    public String add(Task task, BindingResult bindingResult) {
-        System.out.println(task.getStatusCode());
-
-        if (bindingResult.hasErrors()) {
-            log.info(bindingResult.toString());
-            return "add";
-        }
-        taskRepository.save(task);
-        return "add";
-    }
+    @Autowired
+    WatchersRepository watchersRepository;
 
     @GetMapping("/backlog")
     public String getAll(Model model, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
@@ -60,6 +52,8 @@ public class TaskUIController {
             model.addAttribute("page_numbers", pagenumbers);
         }
 
+
+
         model.addAttribute("current_page", page);
 
         if (page == null || size == null) {
@@ -70,16 +64,56 @@ public class TaskUIController {
         return "backlog";
     }
 
-    //7.	Добавить возможность подписываться на задачи
-    @GetMapping("/back")
-    public String getAllFreeTasks(Model model) {
-        List<String> tasksFree = taskService.getBacklogWithoutUser();
-        for (String str :
-                tasksFree) {
-            System.out.println(str);
-
-        }
+    @GetMapping("/free")
+    public String getAllFreeTasks(Model model, @AuthenticationPrincipal AuthUser authUser) {
+        long id = authUser.id();
+        List<Task> tasksFree = taskService.getAvailableTasks(id);
         model.addAttribute("tasksFree", tasksFree);
-        return "backlog";
+        return "free";
     }
+
+    @GetMapping("/assign")
+    @Transactional
+    public String assigning(@ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
+        taskService.assign(task, authUser.id());
+        return "redirect:/free";
+    }
+
+    @GetMapping("/watch")
+    @Transactional
+    public String watching(@ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
+        taskService.watch(task,authUser);
+        return "redirect:/all";
+    }
+
+    @GetMapping("/all")
+    public String getTasks(Model model, @AuthenticationPrincipal AuthUser authUser) {
+        long id = authUser.id();
+        model.addAttribute("tasks", taskService.getTasksForListening(id));
+        System.out.println(taskService.getTasksForListening(id).size());
+        return "all";
+    }
+
+    @GetMapping("/add")
+    public String showForm(Model model) {
+        model.addAttribute("task", new Task());
+        return "add";
+    }
+
+
+    @PostMapping("/add")
+    public String add(TaskTo task, BindingResult bindingResult) {
+        System.out.println(task);
+        Task taskToDB = new Task();
+
+        if (bindingResult.hasErrors()) {
+            log.info(bindingResult.toString());
+            return "redirect:/add";
+        }
+//todo
+        //taskService.add(task);
+        return "redirect:/add";
+    }
+
+
 }
