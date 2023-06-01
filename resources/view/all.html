@@ -28,7 +28,9 @@
                     <td th:text="${task.priorityCode}" scope="col"></td>
                     <td th:text="${task.typeCode}" scope="col"></td>
                     <td th:text="${task.statusCode}" scope="col"></td>
-                    <td><a th:href="@{/watch(id=${task.id})}" class="btn btn-info">Watcher</a></td>
+
+                    <td><a th:href="@{/watch(id=${task.id})}"  class="btn btn-info">Watcher</a></td>
+
                 </tr>
                 </tbody>
             </table>

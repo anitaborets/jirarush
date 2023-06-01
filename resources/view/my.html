@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <th:block th:replace="~{layout/main::page(title='JiraRush: mini bugtracking system',appMain=~{::appMain})}">
     <appMain>
-        <h1 align="center">Backlog</h1>
+        <h1 align="center">My tasks</h1>
         <div class="container text-center">
             <table class="table table-bordered table-sm table-striped">
                 <thead class="thead-dark">
@@ -17,6 +17,7 @@
                     <th th:text="Priority"></th>
                     <th th:text="Type"></th>
                     <th th:text="Status"></th>
+                    <th th:text="Tags"></th>
 
                 </tr>
                 </thead>
@@ -28,19 +29,46 @@
                     <td th:text="${task.priorityCode}" scope="col"></td>
                     <td th:text="${task.typeCode}" scope="col"></td>
                     <td th:text="${task.statusCode}" scope="col"></td>
+                    <td>
+                        <ul th:each="tag : ${task.tags}">
+                            <span class="badge badge-pill badge-success text-bg-danger" th:text="${tag}"></span>
+                        </ul>
+                    </td>
+
+                    <td><a th:href="@{/tag(id=${task.id})}" class="btn btn-primary">Add tag</a></td>
                 </tr>
                 </tbody>
             </table>
 
         </div>
-
-        <div>
-            <h2 align="center">
-                <button style="btn btn-light" th:each="pageNumber:${page_numbers}" class="button-page">
-                    <a th:href="@{/backlog(page=${pageNumber},size=2)}" th:text="${pageNumber}"
-                       th:classappend="${pageNumber==current_page}"></a>
-                </button>
-            </h2>
+        <span class="badge badge-pill badge-primary">Primary</span>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <form>
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <input type="text" name="name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Add Tags:</label><br/>
+                            <input type="text" name="tags" placeholder="Tags"
+                                   class="tm-input form-control tm-input-info"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Details:</label>
+                            <textarea class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
+        <script type="text/javascript">
+            $(".tm-input").tagsManager();
+        </script>
+
     </appMain>
 </th:block>

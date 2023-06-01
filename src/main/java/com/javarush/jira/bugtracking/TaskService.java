@@ -89,6 +89,15 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
         return repository.getAll();
     }
 
+    public List<Task> getMyTasks(long id) {
+        List<Task> myTasks = repository.getMyTask(id);
+        if (!myTasks.isEmpty()) {
+            return myTasks;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     @Transactional
     public void add(TaskTo task) {
         //todo
@@ -111,16 +120,14 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
         if (task != null && task.getId() != null) {
             Optional<Task> optional = repository.findById(task.getId());
             if (optional.isPresent()) {
-                Task taskForAssign = task;
                 UserBelong userBelong = new UserBelong();
                 userBelong.setUserId(id);
-                userBelong.setObjectId(taskForAssign.getId());
+                userBelong.setObjectId(task.getId());
                 userBelong.setObjectType(ObjectType.TASK);
                 userBelong.setUserTypeCode("user");
                 userBelong.setStartpoint(LocalDateTime.now());
                 userBelongRepository.save(userBelong);
-                Activity activity = newActivity(optional.get(), userRepository.getExisted(id),ASSIGNATION,TASK_WAS_ASSIGN,ASSIGNATION,"normal","in_progress","task",5);
-              // task.getActivities().add(activity);
+                Activity activity = newActivity(optional.get(), userRepository.getExisted(id), ASSIGNATION, TASK_WAS_ASSIGN, ASSIGNATION, "normal", "in_progress", "task", 5);
                 activityRepository.save(activity);
                 log.warn("Task was asign, task id: " + task.getId() + ", user id:" + id);
             }
@@ -129,15 +136,13 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
 
     @Transactional
     public void watch(Task task, AuthUser authUser) {
-        if (task != null && task.getId() != null) {
-            Optional<Task> optional = repository.findById(task.getId());
-            if (optional.isPresent()) {
-                Watcher watcher = new Watcher(authUser.getUser(), task);
-                watchersRepository.save(watcher);
+        if (task != null && task.getId() != null && repository.findById(task.getId()).isPresent()) {
+            long rows = watchersRepository.count();
+            Watcher watcher = new Watcher(authUser.getUser(), task);
+            watchersRepository.save(watcher);
+            if (!(rows == watchersRepository.count())) {
                 registerEvent(watcher);
-                System.out.println(domainEvents.size());
-                Activity activity = newActivity(optional.get(), authUser.getUser(), NEW_WATCHER,NEW_WATCHER,NEW_WATCHER,"normal","in_progress","task",5);
-               // task.getActivities().add(activity);
+                Activity activity = newActivity(task, authUser.getUser(), NEW_WATCHER, NEW_WATCHER, NEW_WATCHER, "normal", "in_progress", "task", 5);
                 activityRepository.save(activity);
                 log.warn("New watcher was added, task id: " + task.getId());
             }

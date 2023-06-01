@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.javarush.jira.common.model.TitleEntity;
 import com.javarush.jira.common.util.validation.Code;
 import com.javarush.jira.common.util.validation.Description;
+import com.javarush.jira.login.User;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
@@ -77,4 +78,5 @@ public class Task extends TitleEntity {
     @JoinColumn(name = "parent_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Task parent;
+
 }

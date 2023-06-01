@@ -23,7 +23,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -53,7 +56,6 @@ public class TaskUIController {
         }
 
 
-
         model.addAttribute("current_page", page);
 
         if (page == null || size == null) {
@@ -81,8 +83,8 @@ public class TaskUIController {
 
     @GetMapping("/watch")
     @Transactional
-    public String watching(@ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
-        taskService.watch(task,authUser);
+    public String watching(Model model, @ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
+        taskService.watch(task, authUser);
         return "redirect:/all";
     }
 
@@ -90,8 +92,13 @@ public class TaskUIController {
     public String getTasks(Model model, @AuthenticationPrincipal AuthUser authUser) {
         long id = authUser.id();
         model.addAttribute("tasks", taskService.getTasksForListening(id));
-        System.out.println(taskService.getTasksForListening(id).size());
         return "all";
+    }
+
+    @GetMapping("/my")
+    public String myTasks(Model model, @AuthenticationPrincipal AuthUser authUser) {
+        model.addAttribute("tasks", taskService.getMyTasks(authUser.id()));
+        return "my";
     }
 
     @GetMapping("/add")
