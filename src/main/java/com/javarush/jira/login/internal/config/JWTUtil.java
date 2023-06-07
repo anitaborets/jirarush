@@ -12,8 +12,7 @@ import java.util.Date;
 
 @Component
 public class JWTUtil {
-    //todo
-    private String SECRET_KEY = "jirarush";
+     private String SECRET_KEY = "jirarush";
 
     public String generateToken(String email) {
         Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());

@@ -9,13 +9,10 @@ import com.javarush.jira.bugtracking.internal.repository.ActivityRepository;
 import com.javarush.jira.bugtracking.internal.repository.TaskRepository;
 import com.javarush.jira.bugtracking.internal.repository.UserBelongRepository;
 import com.javarush.jira.bugtracking.internal.repository.WatchersRepository;
-import com.javarush.jira.bugtracking.to.ActivityTo;
 import com.javarush.jira.bugtracking.to.ObjectType;
 import com.javarush.jira.bugtracking.to.TaskTo;
 import com.javarush.jira.login.AuthUser;
-import com.javarush.jira.login.User;
 import com.javarush.jira.login.internal.UserRepository;
-import com.javarush.jira.ref.internal.Reference;
 import jakarta.persistence.Transient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +20,9 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static com.javarush.jira.bugtracking.internal.model.Activity.newActivity;
@@ -153,7 +148,7 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
     public void toTest(Task task, long id) {
         if (task != null && task.getId() != null) {
             Optional<Task> optional = repository.findById(task.getId());
-            if (optional.isPresent()) {
+            if (optional.isPresent() && !optional.get().getStatusCode().equals("ready")) {
                 Activity activity = newActivity(optional.get(), userRepository.getExisted(id), TESTING, TESTING, TESTING, task.getPriorityCode(), "ready", "task", 5);
                 activityRepository.save(activity);
                 Task t = optional.get();
@@ -168,7 +163,7 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
     public void done(Task task, long id) {
         if (task != null && task.getId() != null) {
             Optional<Task> optional = repository.findById(task.getId());
-            if (optional.isPresent()) {
+            if (optional.isPresent() && !optional.get().getStatusCode().equals("done")) {
                 Activity activity = newActivity(optional.get(), userRepository.getExisted(id), CLOSED, CLOSED, CLOSED, task.getPriorityCode(), "done", "task", 5);
                 activityRepository.save(activity);
                 Task t = optional.get();
@@ -181,7 +176,8 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
 
     @Transactional(readOnly = true)
     public Map<String, Integer> getTime(long id) {
-        List<Activity> existed = activityRepository.getAll(id);
+        List<Activity> existed = activityRepository.getAll(id).stream()
+                .sorted(Comparator.comparing(Activity::getUpdated)).toList();
 
         Map<String, Integer> result = new HashMap<>();
         String inProgress = "in_progress";
@@ -196,10 +192,13 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
         result.put(inTesting, 0);
 
         if (!existed.isEmpty()) {
-            Map<String, LocalDateTime> times = existed.stream().collect(Collectors.toMap(Activity::getStatusCode, Activity::getUpdated));
+            BinaryOperator<LocalDateTime> mergeFunction = (oldValue, newValue) -> newValue;
+            Map<String, LocalDateTime> times = existed.stream()
+                    .collect(Collectors.toMap(Activity::getStatusCode, Activity::getUpdated, mergeFunction));
+
             //time in development - progress
             if (times.containsKey(inProgress) && !times.containsKey(ready) && !times.containsKey(done)) {
-                long daysBetween = DAYS.between(times.get(inProgress),LocalDateTime.now());
+                long daysBetween = DAYS.between(times.get(inProgress), LocalDateTime.now());
                 result.put(inProgress, (int) daysBetween);
             }
             //time in development

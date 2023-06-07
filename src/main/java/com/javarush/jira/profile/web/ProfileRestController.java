@@ -15,7 +15,6 @@ public class ProfileRestController extends AbstractProfileController {
 
     @GetMapping
     public ProfileTo get(@AuthenticationPrincipal AuthUser authUser) {
-
         return super.get(authUser.id());
     }
 

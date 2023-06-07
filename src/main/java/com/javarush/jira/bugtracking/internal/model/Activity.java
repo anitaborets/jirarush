@@ -18,10 +18,7 @@ import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "activity")
@@ -94,4 +91,6 @@ public class Activity extends BaseEntity {
         activity.setTypeCode(typeCode);
         return activity;
     }
+
+
 }

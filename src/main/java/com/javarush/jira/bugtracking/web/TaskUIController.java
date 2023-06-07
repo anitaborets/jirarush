@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -86,18 +87,14 @@ public class TaskUIController {
     @GetMapping("/toTest")
     @Transactional
     public String testing(Model model, @ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
-        if (!task.getStatusCode().equals("ready")) {
-            taskService.toTest(task, authUser.id());
-        }
+        taskService.toTest(task, authUser.id());
         return "redirect:/my";
     }
 
     @GetMapping("/done")
     @Transactional
     public String done(Model model, @ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
-        if (!task.getStatusCode().equals("done")) {
-            taskService.done(task, authUser.id());
-        }
+        taskService.done(task, authUser.id());
         return "redirect:/my";
     }
 
@@ -132,7 +129,7 @@ public class TaskUIController {
     }
 
     @GetMapping("/time")
-    public String modal(Model model, @RequestParam("id") Long id) {
+    public String getTime(Model model, @RequestParam("id") Long id) {
         Map<String, Integer> times = taskService.getTime(id);
         StringBuilder builder = new StringBuilder();
         builder.append("Time info, days: ");
