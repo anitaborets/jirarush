@@ -5,7 +5,10 @@ import com.javarush.jira.common.BaseRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface TaskRepository extends BaseRepository<Task> {
@@ -34,5 +37,8 @@ public interface TaskRepository extends BaseRepository<Task> {
     @Query(value = "SELECT * FROM task INNER JOIN user_belong ON task.id = user_belong.object_id",
             nativeQuery = true)
     List<Task> getForListen(long userId);
+
+    Optional<Task> getTaskById(long taskId);
+
 }
 

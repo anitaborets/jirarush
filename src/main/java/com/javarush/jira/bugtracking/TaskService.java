@@ -15,6 +15,7 @@ import com.javarush.jira.bugtracking.to.TaskTo;
 import com.javarush.jira.login.AuthUser;
 import com.javarush.jira.login.User;
 import com.javarush.jira.login.internal.UserRepository;
+import com.javarush.jira.ref.internal.Reference;
 import jakarta.persistence.Transient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,16 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.javarush.jira.bugtracking.internal.model.Activity.newActivity;
 import static com.javarush.jira.common.Constants.*;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 @Slf4j
@@ -99,23 +105,6 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
     }
 
     @Transactional
-    public void add(TaskTo task) {
-        //todo
-        System.out.println(task);
-        //System.out.println(task.isEnabled());
-
-        // if(task.isEnabled()) {
-
-        Task taskForSave = mapper.toEntity(task);
-        //taskForSave.setEnabled(true);
-
-        repository.save(taskForSave);
-        // }
-
-        log.warn("task was added, title: " + task.getTitle());
-    }
-
-    @Transactional
     public void assign(Task task, long id) {
         if (task != null && task.getId() != null) {
             Optional<Task> optional = repository.findById(task.getId());
@@ -127,8 +116,11 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
                 userBelong.setUserTypeCode("user");
                 userBelong.setStartpoint(LocalDateTime.now());
                 userBelongRepository.save(userBelong);
-                Activity activity = newActivity(optional.get(), userRepository.getExisted(id), ASSIGNATION, TASK_WAS_ASSIGN, ASSIGNATION, "normal", "in_progress", "task", 5);
+                Activity activity = newActivity(optional.get(), userRepository.getExisted(id), ASSIGNATION, TASK_WAS_ASSIGN, ASSIGNATION, task.getPriorityCode(), "in_progress", "task", 5);
                 activityRepository.save(activity);
+                Task t = optional.get();
+                t.setStatusCode("in_progress");
+                repository.save(t);
                 log.warn("Task was asign, task id: " + task.getId() + ", user id:" + id);
             }
         }
@@ -142,10 +134,93 @@ public class TaskService extends BugtrackingService<Task, TaskTo, TaskRepository
             watchersRepository.save(watcher);
             if (!(rows == watchersRepository.count())) {
                 registerEvent(watcher);
-                Activity activity = newActivity(task, authUser.getUser(), NEW_WATCHER, NEW_WATCHER, NEW_WATCHER, "normal", "in_progress", "task", 5);
-                activityRepository.save(activity);
                 log.warn("New watcher was added, task id: " + task.getId());
             }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Task> getById(Long id) {
+        return repository.findById(id);
+    }
+
+    @Transactional
+    public void updateTask(Task task) {
+        repository.save(task);
+    }
+
+    @Transactional
+    public void toTest(Task task, long id) {
+        if (task != null && task.getId() != null) {
+            Optional<Task> optional = repository.findById(task.getId());
+            if (optional.isPresent()) {
+                Activity activity = newActivity(optional.get(), userRepository.getExisted(id), TESTING, TESTING, TESTING, task.getPriorityCode(), "ready", "task", 5);
+                activityRepository.save(activity);
+                Task t = optional.get();
+                t.setStatusCode("ready");
+                repository.save(t);
+                log.warn("Task was send to testing, task id: " + task.getId() + ", user id:" + id);
+            }
+        }
+    }
+
+    @Transactional
+    public void done(Task task, long id) {
+        if (task != null && task.getId() != null) {
+            Optional<Task> optional = repository.findById(task.getId());
+            if (optional.isPresent()) {
+                Activity activity = newActivity(optional.get(), userRepository.getExisted(id), CLOSED, CLOSED, CLOSED, task.getPriorityCode(), "done", "task", 5);
+                activityRepository.save(activity);
+                Task t = optional.get();
+                t.setStatusCode("done");
+                repository.save(t);
+                log.warn("Task is finished, task id: " + task.getId() + ", user id:" + id);
+            }
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Integer> getTime(long id) {
+        List<Activity> existed = activityRepository.getAll(id);
+
+        Map<String, Integer> result = new HashMap<>();
+        String inProgress = "in_progress";
+        String ready = "ready";
+        String done = "done";
+        String inDevelopment = "in development";
+        String inTestingProgress = "in testing, progress";
+        String inTesting = "in testing, finished";
+        result.put(inProgress, 0);
+        result.put(inDevelopment, 0);
+        result.put(inTestingProgress, 0);
+        result.put(inTesting, 0);
+
+        if (!existed.isEmpty()) {
+            Map<String, LocalDateTime> times = existed.stream().collect(Collectors.toMap(Activity::getStatusCode, Activity::getUpdated));
+            //time in development - progress
+            if (times.containsKey(inProgress) && !times.containsKey(ready) && !times.containsKey(done)) {
+                long daysBetween = DAYS.between(times.get(inProgress),LocalDateTime.now());
+                result.put(inProgress, (int) daysBetween);
+            }
+            //time in development
+            if (times.containsKey(inProgress) && times.containsKey(ready)) {
+                long daysBetween = DAYS.between(times.get(inProgress), times.get(ready));
+                result.put(inDevelopment, (int) daysBetween);
+            }
+
+            //time in testing - progress
+            if (times.containsKey(ready) && !times.containsKey(done)) {
+                if (activityRepository.timeToCurrentDate(id, ready) != null) {
+                    result.put(inTestingProgress, activityRepository.timeToCurrentDate(id, ready));
+                }
+            }
+
+            //time in testing
+            if (times.containsKey(ready) && times.containsKey(done)) {
+                long daysBetween = DAYS.between(times.get(ready), times.get(done));
+                result.put(inTesting, (int) daysBetween);
+            }
+        }
+        return result;
     }
 }

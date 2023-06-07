@@ -4,4 +4,6 @@ public class Constants {
     public static final String NEW_WATCHER = "Watcher";
     public static final String TASK_WAS_ASSIGN = "Task was assign";
     public static final String ASSIGNATION = "Assignation";
+    public static final String TESTING = "Testing";
+    public static final String CLOSED = "Done";
 }

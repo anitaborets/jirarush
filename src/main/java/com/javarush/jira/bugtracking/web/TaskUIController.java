@@ -1,13 +1,11 @@
 package com.javarush.jira.bugtracking.web;
 
 import com.javarush.jira.bugtracking.TaskService;
-import com.javarush.jira.bugtracking.internal.mapper.TaskMapper;
 import com.javarush.jira.bugtracking.internal.model.Task;
+import com.javarush.jira.bugtracking.internal.repository.ActivityRepository;
 import com.javarush.jira.bugtracking.internal.repository.TaskRepository;
 import com.javarush.jira.bugtracking.internal.repository.WatchersRepository;
-import com.javarush.jira.bugtracking.to.TaskTo;
 import com.javarush.jira.login.AuthUser;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -22,11 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,11 +32,12 @@ public class TaskUIController {
 
     @Autowired
     private TaskService taskService;
-
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
     WatchersRepository watchersRepository;
+    @Autowired
+    ActivityRepository activityRepository;
 
     @GetMapping("/backlog")
     public String getAll(Model model, @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
@@ -88,6 +83,24 @@ public class TaskUIController {
         return "redirect:/all";
     }
 
+    @GetMapping("/toTest")
+    @Transactional
+    public String testing(Model model, @ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
+        if (!task.getStatusCode().equals("ready")) {
+            taskService.toTest(task, authUser.id());
+        }
+        return "redirect:/my";
+    }
+
+    @GetMapping("/done")
+    @Transactional
+    public String done(Model model, @ModelAttribute("task") Task task, BindingResult bindingResult, @AuthenticationPrincipal AuthUser authUser) {
+        if (!task.getStatusCode().equals("done")) {
+            taskService.done(task, authUser.id());
+        }
+        return "redirect:/my";
+    }
+
     @GetMapping("/all")
     public String getTasks(Model model, @AuthenticationPrincipal AuthUser authUser) {
         long id = authUser.id();
@@ -101,26 +114,35 @@ public class TaskUIController {
         return "my";
     }
 
-    @GetMapping("/add")
-    public String showForm(Model model) {
-        model.addAttribute("task", new Task());
-        return "add";
-    }
-
-
-    @PostMapping("/add")
-    public String add(TaskTo task, BindingResult bindingResult) {
-        System.out.println(task);
-        Task taskToDB = new Task();
-
+    @GetMapping("/tag")
+    public String addTag(@ModelAttribute("task") Task task, @ModelAttribute("tag") String tag, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.info(bindingResult.toString());
-            return "redirect:/add";
+            return "redirect:/my";
         }
-//todo
-        //taskService.add(task);
-        return "redirect:/add";
+        Optional<Task> optional = taskService.getById(task.getId());
+        if (optional.isPresent()) {
+            Task existed = optional.get();
+            Set<String> tags = existed.getTags();
+            tags.add(tag);
+            existed.setTags(tags);
+            taskService.updateTask(existed);
+        }
+        return "redirect:/my";
     }
 
-
+    @GetMapping("/time")
+    public String modal(Model model, @RequestParam("id") Long id) {
+        Map<String, Integer> times = taskService.getTime(id);
+        StringBuilder builder = new StringBuilder();
+        builder.append("Time info, days: ");
+        for (Map.Entry<String, Integer> entry : times.entrySet()) {
+            if (entry.getValue() != 0) {
+                builder.append(entry.getKey()).append(" : ").append(entry.getValue().toString()).append(" ");
+            }
+        }
+        model.addAttribute("show", true);
+        model.addAttribute("times", builder);
+        return "all";
+    }
 }

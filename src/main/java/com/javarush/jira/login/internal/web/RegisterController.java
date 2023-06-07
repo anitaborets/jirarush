@@ -24,6 +24,7 @@ import static com.javarush.jira.common.util.validation.ValidationUtil.checkNew;
 @RequestMapping(RegisterController.REGISTER_URL)
 @RequiredArgsConstructor
 public class RegisterController extends AbstractUserController {
+
     static final String REGISTER_URL = "/ui/register";
 
     private final ApplicationEventPublisher eventPublisher;

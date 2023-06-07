@@ -89,7 +89,7 @@ public class Activity extends BaseEntity {
         activity.setDescription(description);
         activity.setUpdated(LocalDateTime.now());
         activity.setPriorityCode(priorityCode);
-        activity.setStatusCode(task.getStatusCode());
+        activity.setStatusCode(statusCode);
         activity.setEstimate(estimate);
         activity.setTypeCode(typeCode);
         return activity;

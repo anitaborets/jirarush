@@ -9,7 +9,7 @@ app:
 
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     open-in-view: false
 
 # validate db by model

@@ -29,46 +29,32 @@
                     <td th:text="${task.priorityCode}" scope="col"></td>
                     <td th:text="${task.typeCode}" scope="col"></td>
                     <td th:text="${task.statusCode}" scope="col"></td>
+
                     <td>
                         <ul th:each="tag : ${task.tags}">
                             <span class="badge badge-pill badge-success text-bg-danger" th:text="${tag}"></span>
                         </ul>
                     </td>
 
-                    <td><a th:href="@{/tag(id=${task.id})}" class="btn btn-primary">Add tag</a></td>
+
+                    <td>
+                        <form th:method="POST" th:action="@{/tag}">
+                            <td><a th:href="@{/tag(id=${task.id},tag=${'Java'})}" class="btn btn-success">Java</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'SQL'})}" class="btn btn-primary">SQL</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'JS'})}" class="btn btn-warning">JS</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'Front'})}" class="btn btn-info">Front</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'Back'})}" class="btn btn-light">Back</a>
+                            </td>
+                        </form>
+                    </td>
+
+                    <td><a th:href="@{/toTest(id=${task.id})}" class="btn btn-warning">Ready</a></td>
+                    <td><a th:href="@{/done(id=${task.id})}" class="btn btn-success">Done</a></td>
                 </tr>
                 </tbody>
             </table>
+        </div>
 
-        </div>
-        <span class="badge badge-pill badge-primary">Primary</span>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <form>
-                        <div class="form-group">
-                            <label>Name:</label>
-                            <input type="text" name="name" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Add Tags:</label><br/>
-                            <input type="text" name="tags" placeholder="Tags"
-                                   class="tm-input form-control tm-input-info"/>
-                        </div>
-                        <div class="form-group">
-                            <label>Details:</label>
-                            <textarea class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-success">Submit</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <script type="text/javascript">
-            $(".tm-input").tagsManager();
-        </script>
 
     </appMain>
 </th:block>
