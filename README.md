@@ -17,6 +17,7 @@ getTime  в TaskRestController
 7.Локализация - стартовая страница и шаблоны писем
 8.Backlog - backlog.html, методы getAll в TaskUIController и Page<TaskTo> getAllPageable в TaskRestController
 9.JWT token - до конца нереализован, происходит регистрация нового пользователя и выдача токена через REST
+10.изменен баннер)
 
 В файле screens.docx прилагаю скрины фронта
 
