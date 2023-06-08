@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<!--/*@thymesVar id="authUser" type="com.javarush.jira.login.AuthUser"*/-->
+<!--/*@thymesVar id="taskMap" type="java.util.Map<com.javarush.jira.bugtracking.to.SprintTo, java.util.List<com.javarush.jira.bugtracking.to.TaskTo>>"*/-->
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<th:block th:replace="~{layout/main::page(title='JiraRush: mini bugtracking system',appMain=~{::appMain})}">
+    <appMain>
+        <h1 align="center">My tasks</h1>
+        <div class="container text-center">
+            <table class="table table-bordered table-sm table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th th:text="Project"></th>
+                    <th th:text="Title"></th>
+                    <th th:text="Description"></th>
+                    <th th:text="Priority"></th>
+                    <th th:text="Type"></th>
+                    <th th:text="Status"></th>
+                    <th th:text="Tags"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.project.title}" scope="col"></td>
+                    <td th:text="${task.title}" scope="col"></td>
+                    <td th:text="${task.description}" scope="col"></td>
+                    <td th:text="${task.priorityCode}" scope="col"></td>
+                    <td th:text="${task.typeCode}" scope="col"></td>
+                    <td th:text="${task.statusCode}" scope="col"></td>
+
+                    <td>
+                        <ul th:each="tag : ${task.tags}">
+                            <span class="badge badge-pill badge-success text-bg-danger" th:text="${tag}"></span>
+                        </ul>
+                    </td>
+
+
+                    <td>
+                        <form th:method="POST" th:action="@{/tag}">
+                            <td><a th:href="@{/tag(id=${task.id},tag=${'Java'})}" class="btn btn-success">Java</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'SQL'})}" class="btn btn-primary">SQL</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'JS'})}" class="btn btn-warning">JS</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'Front'})}" class="btn btn-info">Front</a>
+                                <a th:href="@{/tag(id=${task.id},tag=${'Back'})}" class="btn btn-light">Back</a>
+                            </td>
+                        </form>
+                    </td>
+                    <td><a th:href="@{/toTest(id=${task.id})}" class="btn btn-warning">Ready</a></td>
+                    <td><a th:href="@{/done(id=${task.id})}" class="btn btn-success">Done</a></td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </appMain>
+</th:block>

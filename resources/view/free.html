@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<!--/*@thymesVar id="authUser" type="com.javarush.jira.login.AuthUser"*/-->
+<!--/*@thymesVar id="taskMap" type="java.util.Map<com.javarush.jira.bugtracking.to.SprintTo, java.util.List<com.javarush.jira.bugtracking.to.TaskTo>>"*/-->
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<th:block th:replace="~{layout/main::page(title='JiraRush: mini bugtracking system',appMain=~{::appMain})}">
+    <appMain>
+        <h3 align="center">This tasks are available for you</h3>
+        <div class="container text-center">
+            <table class="table table-bordered table-sm table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th th:text="Project"></th>
+                    <th th:text="Title"></th>
+                    <th th:text="Description"></th>
+                    <th th:text="Priority"></th>
+                    <th th:text="Type"></th>
+                    <th th:text="Status"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasksFree}">
+                    <td th:text="${task.project.title}" scope="col"></td>
+                    <td th:text="${task.title}" scope="col"></td>
+                    <td th:text="${task.description}" scope="col"></td>
+                    <td th:text="${task.priorityCode}" scope="col"></td>
+                    <td th:text="${task.typeCode}" scope="col"></td>
+                    <td th:text="${task.statusCode}" scope="col"></td>
+                    <td><a th:href="@{/assign(id=${task.id})}" class="btn btn-success">Assign</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </appMain>
+</th:block>

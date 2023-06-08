@@ -20,6 +20,11 @@ public class TitleTo extends BaseTo {
         this.enabled = enabled;
     }
 
+    public TitleTo(Long id, String title) {
+        super(id);
+        this.title = title;
+    }
+
     public void enable(boolean enabled) {
         this.enabled = enabled;
     }

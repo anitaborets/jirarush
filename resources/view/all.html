@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
+<!--/*@thymesVar id="authUser" type="com.javarush.jira.login.AuthUser"*/-->
+<!--/*@thymesVar id="taskMap" type="java.util.Map<com.javarush.jira.bugtracking.to.SprintTo, java.util.List<com.javarush.jira.bugtracking.to.TaskTo>>"*/-->
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<th:block th:replace="~{layout/main::page(title='JiraRush: mini bugtracking system',appMain=~{::appMain})}">
+    <appMain>
+        <h1 align="center">Tasks for watching</h1>
+
+        <td class="container text-center">
+            <table class="table table-bordered table-sm table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th th:text="Project"></th>
+                    <th th:text="Title"></th>
+                    <th th:text="Description"></th>
+                    <th th:text="Priority"></th>
+                    <th th:text="Type"></th>
+                    <th th:text="Status"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.project.title}" scope="col"></td>
+                    <td th:text="${task.title}" scope="col"></td>
+                    <td th:text="${task.description}" scope="col"></td>
+                    <td th:text="${task.priorityCode}" scope="col"></td>
+                    <td th:text="${task.typeCode}" scope="col"></td>
+                    <td th:text="${task.statusCode}" scope="col"></td>
+                    <td><a th:href="@{/watch(id=${task.id})}" class="btn btn-info">Watcher</a></td>
+                    <td><a th:href="@{/time(id=${task.id})}" class="btn btn-info">Time info</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+
+        <div class="alert alert-primary alert-dismissible fade show" role="alert" th:if="${show}"
+             th:text="${times}">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+
+    </appMain>
+</th:block>

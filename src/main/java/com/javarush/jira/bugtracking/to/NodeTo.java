@@ -13,5 +13,13 @@ public class NodeTo<E extends NodeTo<E>> extends TitleTo {
         super(id, title, enabled);
         this.title = title;
         this.parent = parent;
+
+    }
+
+    public NodeTo(Long id, String title,  E parent) {
+        super(id, title);
+        this.title = title;
+        this.parent = parent;
+
     }
 }

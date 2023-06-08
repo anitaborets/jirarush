@@ -36,6 +36,7 @@ public class ThymeleafConfig {
             setCacheable(true);
             setCacheTTLMs(appProperties.getTemplatesUpdateCache().toMillis());
             setCharacterEncoding("UTF-8");
+
         }};
     }
 }

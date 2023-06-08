@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.javarush.jira.common.model.TitleEntity;
 import com.javarush.jira.common.util.validation.Code;
 import com.javarush.jira.common.util.validation.Description;
+import com.javarush.jira.login.User;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
@@ -68,12 +69,14 @@ public class Task extends TitleEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<@Size(min = 2, max = 32) String> tags = Set.of();
 
-    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
-    private List<Activity> activities;
+   // @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    //@Transient
+   // private List<Activity> activities;
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Task parent;
+
 }

@@ -5,19 +5,28 @@ import com.javarush.jira.common.util.validation.View;
 import com.javarush.jira.login.AuthUser;
 import com.javarush.jira.login.User;
 import com.javarush.jira.login.UserTo;
+import com.javarush.jira.login.internal.config.AuthResponse;
+import com.javarush.jira.login.internal.config.JWTUtil;
 import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
 
 @Slf4j
 @Validated
@@ -27,15 +36,26 @@ import java.net.URI;
 public class UserController extends AbstractUserController {
     public static final String REST_URL = "/api/users";
 
+    @Autowired
+    JWTUtil jwtUtil;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createWithLocation(@Validated(View.OnCreate.class) @RequestBody UserTo userTo) {
+    public ResponseEntity<?> createWithLocation(@Validated(View.OnCreate.class) @RequestBody UserTo userTo) {
         User created = super.create(userTo);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL)
                 .buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(uriOfNewResource).body(created);
+
+        //token;
+        String token = jwtUtil.generateToken(userTo.getEmail());
+        AuthResponse response = new AuthResponse(userTo.getEmail(), token);
+        return ResponseEntity.ok().body(response);
     }
+
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -61,5 +81,25 @@ public class UserController extends AbstractUserController {
     @CacheEvict(key = "#authUser.user.email")
     public void changePassword(@RequestParam String oldPassword, @Size(min = 5, max = 128) @RequestParam String newPassword, @AuthenticationPrincipal AuthUser authUser) {
         changePassword0(oldPassword, newPassword, authUser.id());
+    }
+
+    @GetMapping("/token")
+    public User gets() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
+        return user;
+    }
+
+    @PostMapping("/loginwithtoken")
+    public Map<String, String> refreshToken(@RequestBody AuthUser authUser) {
+        UsernamePasswordAuthenticationToken inputToken = new UsernamePasswordAuthenticationToken(authUser.getUser().getEmail(), authUser.getUser().getPassword());
+        try {
+            authenticationManager.authenticate(inputToken);
+        } catch (BadCredentialsException e) {
+            return Map.of("message", "incorrect token");
+        }
+        String token = jwtUtil.generateToken(authUser.getUser().getEmail());
+        return Map.of("message", token);
     }
 }

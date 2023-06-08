@@ -4,13 +4,16 @@
 
 <div th:fragment="sidebar">
     <nav class="navbar navbar-expand-lg navbar-dark fixed-left sidebar-nav">
-        <button class="navbar-toggler ms-3 ms-md-4" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        <button class="navbar-toggler ms-3 ms-md-4" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <a href="/" class="navbar-brand me-auto">
-            <img src="/static/images/logo/jr.svg" alt="JavaRush" class="d-inline-block d-none d-lg-block align-text-top ms-3 ms-lg-4 mt-0 mt-lg-2">
-            <img src="/static/images/logo/jr-text.svg" alt="JavaRush" class="d-inline-block d-lg-none align-text-top ms-3 ms-lg-4 mt-0 mt-lg-2">
+            <img src="/static/images/logo/jr.svg" alt="JavaRush"
+                 class="d-inline-block d-none d-lg-block align-text-top ms-3 ms-lg-4 mt-0 mt-lg-2">
+            <img src="/static/images/logo/jr-text.svg" alt="JavaRush"
+                 class="d-inline-block d-lg-none align-text-top ms-3 ms-lg-4 mt-0 mt-lg-2">
             <hr class="text-white d-none d-lg-block" style="width: 232px">
         </a>
         <div th:if="${authUser} == null">
@@ -29,28 +32,35 @@
             <ul class="navbar-nav mb-2 mb-lg-0">
                 <div th:if="${authUser != null && authUser.isAdmin()}">
                     <li class="nav-item menu-item mt-3 mt-lg-0 mb-0 mb-lg-3" id="users">
-                        <a class="nav-link sidebar-nav-link" href="/view/admin/users"><span class="ms-4"><i class="fa-regular fa-folder-open fa-fw me-2"></i>Users</span></a>
+                        <a class="nav-link sidebar-nav-link" href="/view/admin/users"><span class="ms-4"><i
+                                class="fa-regular fa-folder-open fa-fw me-2"></i>Users</span></a>
                     </li>
                 </div>
                 <div th:if="${authUser != null && authUser.isAdmin()}">
                     <li class="nav-item menu-item mt-3 mt-lg-0 mb-0 mb-lg-3" id="references">
-                        <a class="nav-link sidebar-nav-link" href="/ui/admin/references"><span class="ms-4"><i class="fa-regular fa-folder-open fa-fw me-2"></i>References</span></a>
+                        <a class="nav-link sidebar-nav-link" href="/ui/admin/references"><span class="ms-4"><i
+                                class="fa-regular fa-folder-open fa-fw me-2"></i>References</span></a>
                     </li>
                 </div>
-                <li class="nav-item menu-item mt-3 mt-lg-0 mb-0 mb-lg-3" id="test1">
-                    <a class="nav-link sidebar-nav-link" href="#test1"><span class="ms-4"><i class="fa-regular fa-folder-open fa-fw me-2"></i>Link_1</span></a>
+                <li class="nav-item menu-item" id="test5">
+                    <a class="nav-link sidebar-nav-link" href="/"><span class="ms-4"><i
+                            class="fa-solid fa-comments fa-fw me-2"></i>Dashboard</span></a>
                 </li>
                 <li class="nav-item menu-item mb-0 mb-lg-3" id="test2">
-                    <a class="nav-link sidebar-nav-link" href="#test2"><span class="ms-4"><i class="fa-solid fa-list-check fa-fw me-2"></i>Link_2</span></a>
+                    <a class="nav-link sidebar-nav-link" href="/backlog"><span class="ms-4"><i
+                            class="fa-solid fa-list-check fa-fw me-2"></i>Backlog</ span></a>
                 </li>
                 <li class="nav-item menu-item mb-0 mb-lg-3" id="test3">
-                    <a class="nav-link sidebar-nav-link" href="#test3"><span class="ms-4"><i class="fa-solid fa-bug fa-fw me-2"></i>Link_3</span></a>
+                    <a class="nav-link sidebar-nav-link" href="/free"><span class="ms-4"><i
+                            class="fa-solid fa-bug fa-fw me-2"></i>Free tasks</span></a>
                 </li>
                 <li class="nav-item menu-item mb-0 mb-lg-3" id="test4">
-                    <a class="nav-link sidebar-nav-link" href="#test4"><span class="ms-4"><i class="fa-solid fa-book-skull fa-fw me-2"></i>Link_4</span></a>
+                    <a class="nav-link sidebar-nav-link" href="/my"><span class="ms-4"><i
+                            class="fa-solid fa-book-skull fa-fw me-2"></i>My tasks</span></a>
                 </li>
-                <li class="nav-item menu-item" id="test5">
-                    <a class="nav-link sidebar-nav-link" href="#test5"><span class="ms-4"><i class="fa-solid fa-comments fa-fw me-2"></i>Link_5</span></a>
+                <li class="nav-item menu-item mb-0 mb-lg-3" id="test6">
+                    <a class="nav-link sidebar-nav-link" href="/all"><span class="ms-4"><i
+                            class="fa-solid fa-book-skull fa-fw me-2"></i>All tasks</span></a>
                 </li>
             </ul>
         </div>

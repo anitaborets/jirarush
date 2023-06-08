@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -27,7 +29,7 @@ public class TaskTo extends NodeTo<TaskTo> {
     @NoHtml
     String description;
 
-    @NotNull
+    //@NotNull
     SprintTo sprint;
 
     @NotNull
@@ -42,17 +44,19 @@ public class TaskTo extends NodeTo<TaskTo> {
     @Positive
     int estimate;
 
-    @Size(min = 1, max = 30)
-    int storyPoints;
+   // @Size(min = 1, max = 30)
+   // int storyPoints;
 
     Set<String> tags;
 
-    List<ActivityTo> activities;
+   // List<ActivityTo> activities;
 
-    public TaskTo(Long id, String title, boolean enabled, String typeCode, String statusCode, String description, SprintTo sprint,
+
+    public TaskTo(Long id, String title, boolean
+            enabled, String typeCode, String statusCode, String description, SprintTo sprint,
                   ProjectTo project, LocalDateTime updated,
-                  String priorityCode, int estimate, int storyPoints, Set<String> tags, List<ActivityTo> activities, TaskTo parent) {
-        super(id, title, enabled, parent);
+                  String priorityCode, int estimate, Set<String> tags, List<ActivityTo> activities, TaskTo parent) {
+        super(id, title, parent);
         this.typeCode = typeCode;
         this.statusCode = statusCode;
         this.description = description;
@@ -61,8 +65,9 @@ public class TaskTo extends NodeTo<TaskTo> {
         this.updated = updated;
         this.priorityCode = priorityCode;
         this.estimate = estimate;
-        this.storyPoints = storyPoints;
+        //this.storyPoints = storyPoints;
         this.tags = tags;
-        this.activities = activities;
+       // this.activities = activities;
     }
+
 }
